@@ -65,7 +65,11 @@ namespace Example
                     }
                 );
             });
-            //collection.AddHostedService<Sender>();
+            collection.AddHostedService<Sender>();
+
+            // when messages will be being consumed
+            // kill rabbitmq node of cluster randomly and start over
+            // after some iterations I get bug
             collection.AddHostedService<BusRunner>();
         }
     }
