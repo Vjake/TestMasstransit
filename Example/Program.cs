@@ -65,6 +65,8 @@ namespace Example
                     }
                 );
             });
+            // before start create topology like test(exchange)->test(queue)
+            // at rabbitmq
             collection.AddHostedService<Sender>();
 
             // when messages will be being consumed
