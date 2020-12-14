@@ -36,23 +36,23 @@ function channels_are_empty(){
     return $exit_code
 }
 
-# checks that channels are empty
+# checks if there are no channels
 # 100 times with delay in 0.1 second
-function check_channels_are_empty(){
+function check_if_there_are_channels(){
     local i=60
-    echo Checking if channels are empty
+    echo Checking if there are no channels
     while [[ "$i" != '0' ]]
     do
         if ! channels_are_empty
         then
-            echo Channels are not empty
+            echo There are existed channels
             return 1
         fi
         sleep 1s
         (( i-- ))
     done
     
-    echo Channels are empty
+    echo There are no channels
     return 0
 }
 
@@ -123,7 +123,7 @@ function restart_rabbitmqs(){
     return 0
 }
 
-while ! check_channels_are_empty
+while ! check_if_there_are_channels
 do
     restart_rabbitmqs
 done
