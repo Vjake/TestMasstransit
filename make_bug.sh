@@ -89,11 +89,11 @@ function wait_rabbitmq(){
 # Restarts RabbitMQ cluster 5 times
 function restart_rabbitmqs(){
     local i=5
-    echo Restarting RabbitMQs. Times left: $i
     local c=0
     local rabbits=( "rabbitmq1" "rabbitmq2" "rabbitmq3" )
     while [[ "$i" != '0' ]]
     do
+        echo Restarting RabbitMQs. Times left: $i
         if connected_to=$(getchannels | egrep -oh 'rabbitmq[[:digit:]]+')
         then
             docker_kill ${rabbits[$c + 1]}
@@ -117,9 +117,9 @@ function restart_rabbitmqs(){
         docker_start haproxy
         (( i-- ))
         ((c ^= 1))
+        echo RabbitMQ were restarted
     done
     
-    echo RabbitMQ were restarted
     return 0
 }
 
