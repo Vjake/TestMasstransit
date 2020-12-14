@@ -52,7 +52,7 @@ namespace Example
 
                             cfg.ReceiveEndpoint("test", configurator =>
                             {
-                                configurator.PrefetchCount = 2;
+                                configurator.PrefetchCount = 1;
                                 configurator.Consumer(
                                     () => collection.BuildServiceProvider().GetRequiredService<TestConsumer>(),
                                     queueConfigurator =>

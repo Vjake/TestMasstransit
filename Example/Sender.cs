@@ -25,8 +25,8 @@ namespace Example
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Start pushing");
-            for (int i = 1; i < 30000; i++)
+            _logger.LogInformation("Pushing...");
+            for (int i = 1; i < 10000; i++)
             {
                 await _bus.Publish(new TestMessage
                 {
@@ -36,7 +36,7 @@ namespace Example
                     A4 = Guid.NewGuid(),
                 });
             };
-            _logger.LogInformation("Start pushing");
+            _logger.LogInformation("Pushing has ended");
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
