@@ -1,17 +1,19 @@
 #!/bin/bash
 
-# uncomment if you are using ubuntu WSL with docker on windows 10
-#function docker(){
-#    docker.exe "$@"
-#}
-#function docker-compose(){
-#    docker-compose.exe "$@"
-#}
-
-if [[ "${#@}" != "1" ]]
+if [[ "${#@}" == "0" ]]
 then
     echo "./init.sh [address of docker host]"
     exit 1
+fi
+
+if [[ "${#@}" == "2" ]] && [[ "$2" == "10" ]]
+then
+    function docker(){
+        docker.exe "$@"
+    }
+    function docker-compose(){
+        docker-compose.exe "$@"
+    }
 fi
 
 DOCKER_ADDRESS=$1
