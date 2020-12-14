@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # uncomment if you are using ubuntu WSL with docker on windows 10
-function docker(){
-    docker.exe "$@"
-}
-function docker-compose(){
-    docker-compose.exe "$@"
-}
+#function docker(){
+#    docker.exe "$@"
+#}
+#function docker-compose(){
+#    docker-compose.exe "$@"
+#}
 
 if [[ "${#@}" != "1" ]]
 then
