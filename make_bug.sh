@@ -23,7 +23,7 @@ function getchannels(){
     curl --fail $RABBITMQ_UI/api/channels -u admin:admin 2> /dev/null
 }
 
-function channels_are_empty(){
+function are_there_channels(){
     local result=$(getchannels)
     local exit_code=$?
     if [[ "$result" != "[]" ]] || [[ "$exit_code" != "0" ]]
@@ -43,7 +43,7 @@ function check_if_there_are_channels(){
     echo Checking if there are no channels
     while [[ "$i" != '0' ]]
     do
-        if ! channels_are_empty
+        if ! are_there_channels
         then
             echo There are existed channels
             return 1
