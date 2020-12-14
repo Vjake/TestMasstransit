@@ -1,10 +1,10 @@
-﻿using MassTransit;
-using Microsoft.Extensions.Configuration;
+﻿using System;
+using System.Threading.Tasks;
+using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
+using IHost = Microsoft.Extensions.Hosting.IHost;
 
 namespace Example
 {
@@ -12,67 +12,54 @@ namespace Example
     {
         public static async Task Main(string[] args)
         {
-            using (var host = CreateHost())
-            {
-                await host.RunAsync();
-            }
+            using var host = CreateHost();
+
+            await host.RunAsync();
         }
 
-        public static Microsoft.Extensions.Hosting.IHost CreateHost() =>
-            new HostBuilder()
-            .ConfigureServices((hostContext, services) =>
-            {
-                ConfigureServices(services);
-            })
-            .UseConsoleLifetime()
-            .ConfigureLogging((hostingContext, logging) =>
-            {
-                logging.AddConsole();
-            })
-            .Build();
-
-        private static void ConfigureServices(IServiceCollection collection)
+        public static IHost CreateHost()
         {
-            collection.AddTransient<TestConsumer>();
-            collection.AddMassTransit(cfg =>
+            return new HostBuilder()
+                .ConfigureServices((hostContext, services) => { ConfigureServices(services); })
+                .UseConsoleLifetime()
+                .ConfigureLogging((hostingContext, logging) => { logging.AddConsole(); })
+                .Build();
+        }
+
+        static void ConfigureServices(IServiceCollection collection)
+        {
+            collection.AddMassTransit(x =>
             {
-                cfg.AddBus(busRegistrationContext =>
+                x.AddConsumer<TestConsumer>(c => c.UseConcurrentMessageLimit(1));
+
+                x.UsingRabbitMq((context, cfg) =>
                     {
-                        var bus = Bus.Factory.CreateUsingRabbitMq(cfg =>
+                        cfg.Host("localhost", 5672, "/", h =>
                         {
-                            cfg.Host("localhost", 5672, "/", h =>
-                            {
-                                h.Username("admin");
-                                h.Password("admin");
-                            });
-
-                            cfg.Message<TestMessage>(c => c.SetEntityName("test"));
-                            EndpointConvention.Map<TestMessage>(
-                                new Uri("rabbitmq://localhost/%2F/test"));
-
-                            cfg.ReceiveEndpoint("test", configurator =>
-                            {
-                                configurator.PrefetchCount = 1;
-                                configurator.Consumer(
-                                    () => collection.BuildServiceProvider().GetRequiredService<TestConsumer>(),
-                                    queueConfigurator =>
-                                    {
-                                        queueConfigurator.UseConcurrentMessageLimit(1);
-                                    });
-                            });
+                            h.Username("admin");
+                            h.Password("admin");
                         });
-                        return bus;
+
+                        cfg.Message<TestMessage>(c => c.SetEntityName("test"));
+                        EndpointConvention.Map<TestMessage>(new Uri("rabbitmq://localhost/%2F/test"));
+
+                        cfg.ReceiveEndpoint("test", configurator =>
+                        {
+                            configurator.PrefetchCount = 1;
+                            configurator.ConfigureConsumer<TestConsumer>(context);
+                        });
                     }
                 );
             });
-            // before start create topology like test(exchange)->test(queue)
-            // at rabbitmq
-            collection.AddHostedService<Sender>();
 
             // when messages will be being consumed
             // kill rabbitmq node of cluster randomly and start over
             // after some iterations I get bug
             collection.AddHostedService<BusRunner>();
+
+            // before start create topology like test(exchange)->test(queue)
+            // at rabbitmq
+            collection.AddHostedService<Sender>();
         }
     }
 }
