@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using MassTransit;
@@ -25,17 +26,24 @@ namespace Example
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             await WaitForHealthyBus(cancellationToken);
-
-            _logger.LogInformation("Pushing...");
-            for (var i = 1; i < 1000; i++)
-                await _bus.Publish(new TestMessage
+            for (var i = 0; i < 1000; i++)
+            {
+                try
                 {
-                    A1 = Guid.NewGuid(),
-                    A2 = Guid.NewGuid(),
-                    A3 = Guid.NewGuid(),
-                    A4 = Guid.NewGuid(),
-                });
-            ;
+                    await _bus.Publish(new TestMessage
+                    {
+                        A1 = Guid.NewGuid(),
+                        A2 = Guid.NewGuid(),
+                        A3 = Guid.NewGuid(),
+                        A4 = Guid.NewGuid(),
+                    });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogInformation("Exception occured");
+                    i--;
+                }
+            }
             _logger.LogInformation("Pushing has ended");
         }
 

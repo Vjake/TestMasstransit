@@ -17,10 +17,7 @@ namespace Example
 
         public async Task Consume(ConsumeContext<TestMessage> context)
         {
-            var i = Counter.Increment();
-            _logger.LogInformation($"Iteration `{i}`");
-            await Task.Delay(5000);
-            _logger.LogInformation($"Iteration `{i}` closed");
+            throw new Exception("ex");
         }
     }
 }

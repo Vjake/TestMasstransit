@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using GreenPipes;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -45,8 +46,13 @@ namespace Example
 
                         cfg.ReceiveEndpoint("test", configurator =>
                         {
-                            configurator.PrefetchCount = 1;
-                            configurator.ConfigureConsumer<TestConsumer>(context);
+                            configurator.PrefetchCount = 30;
+                            configurator.ConfigureConsumer<TestConsumer>(context, queueC =>
+                            {
+
+                                queueC.UseConcurrencyLimit(30);
+                                queueC.UseConcurrentMessageLimit(30);
+                            });
                         });
                     }
                 );

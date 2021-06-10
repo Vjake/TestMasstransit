@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+    rabbitmq1:
+        image: "rabbitmq_test"
+        hostname: rabbitmq1
+        deploy:
+            restart_policy:
+                delay: 0s
+        environment:
+            RABBITMQ_ERLANG_COOKIE: cookie
+            RABBITMQ_DEFAULT_USER: admin
+            RABBITMQ_DEFAULT_PASS: admin
+        ports:
+            - "1936:1936"
+            - "5672:5672"
+            - "15672:15672"
+        volumes:
+          - rabbitmq_mnesia:/var/lib/rabbitmq
+
+volumes:
+  rabbitmq_mnesia:

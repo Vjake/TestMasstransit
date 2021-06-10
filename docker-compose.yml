@@ -1,9 +1,8 @@
+version: '3.7'
+
 services:
     haproxy:
-        build:
-            context: ./haproxy
-            dockerfile: Dockerfile
-        container_name: haproxy
+        image: "haproxy_test"
         hostname: haproxy
         depends_on:
             - rabbitmq1
@@ -20,40 +19,51 @@ services:
             LOG_LEVEL: "info"
 
     rabbitmq1:
-        build:
-            context: ./rabbitmq
-            dockerfile: Dockerfile
-        container_name: rabbitmq1
+        image: "rabbitmq_test"
         hostname: rabbitmq1
+        deploy:
+            restart_policy:
+                delay: 0s
         environment:
             RABBITMQ_ERLANG_COOKIE: cookie
             RABBITMQ_DEFAULT_USER: admin
             RABBITMQ_DEFAULT_PASS: admin
         ports:
             - 15673:15672
+        volumes:
+          - rabbitmq_mnesia:/var/lib/rabbitmq
 
     rabbitmq2:
-        build:
-            context: ./rabbitmq
-            dockerfile: Dockerfile
-        container_name: rabbitmq2
+        image: "rabbitmq_test"
         hostname: rabbitmq2
+        deploy:
+            restart_policy:
+                delay: 0s
         environment:
             RABBITMQ_ERLANG_COOKIE: cookie
             RABBITMQ_DEFAULT_USER: admin
             RABBITMQ_DEFAULT_PASS: admin
         ports:
             - 15674:15672
+        volumes:
+          - rabbitmq_mnesia2:/var/lib/rabbitmq
 
     rabbitmq3:
-        build:
-            context: ./rabbitmq
-            dockerfile: Dockerfile
-        container_name: rabbitmq3
+        image: "rabbitmq_test"
         hostname: rabbitmq3
+        deploy:
+            restart_policy:
+                delay: 0s
         environment:
             RABBITMQ_ERLANG_COOKIE: cookie
             RABBITMQ_DEFAULT_USER: admin
             RABBITMQ_DEFAULT_PASS: admin
         ports:
             - 15675:15672
+        volumes:
+          - rabbitmq_mnesia3:/var/lib/rabbitmq
+
+volumes:
+  rabbitmq_mnesia:
+  rabbitmq_mnesia2:
+  rabbitmq_mnesia3:
